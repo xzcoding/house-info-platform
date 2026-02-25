@@ -3,9 +3,10 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-// 导入 UI 组件库
-import UIUXProMax from 'ui-ux-pro-max'
-import 'ui-ux-pro-max/dist/style.css'
+// 导入 Element Plus
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
 // 导入图标库
 import * as IconPark from '@icon-park/vue-next'
@@ -15,7 +16,7 @@ const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
-app.use(UIUXProMax)
+app.use(ElementPlus, { locale: zhCn })
 
 // 注册全局图标
 Object.keys(IconPark).forEach(key => {
