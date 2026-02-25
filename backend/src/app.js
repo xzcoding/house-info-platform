@@ -23,10 +23,10 @@ app.get('/health', (req, res) => {
 
 // API 路由
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
 app.use('/api/houses', require('./routes/houses'));
-app.use('/api/agents', require('./routes/agents'));
 app.use('/api/consultations', require('./routes/consultations'));
+// app.use('/api/users', require('./routes/users')); // 待开发
+// app.use('/api/agents', require('./routes/agents')); // 待开发
 
 // 404 处理
 app.use((req, res) => {
