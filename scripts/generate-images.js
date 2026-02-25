@@ -10,7 +10,7 @@ const path = require('path');
 const WANXIANG_CONFIG = {
   apiKey: process.env.WANXIANG_API_KEY || '',
   apiSecret: process.env.WANXIANG_API_SECRET || '',
-  endpoint: 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation'
+  endpoint: 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation'
 };
 
 // 图片生成提示词
@@ -79,8 +79,12 @@ const IMAGE_PROMPTS = [
 /**
  * 调用通义万相 API 生成图片
  */
-async function generateImage(prompt, size = '1200x800') {
-  const [width, height] = size.split('x').map(Number);
+async function generateImage(prompt, size = '1024*1024') {
+  // 通义万相支持的尺寸：1024*1024, 720*1280, 1280*720
+  const validSizes = ['1024*1024', '720*1280', '1280*720'];
+  if (!validSizes.includes(size)) {
+    size = '1024*1024'; // 默认尺寸
+  }
   
   const payload = {
     model: 'wanx-v1',
@@ -88,11 +92,13 @@ async function generateImage(prompt, size = '1200x800') {
       prompt: prompt
     },
     parameters: {
-      size: `${width}*${height}`,
+      size: size,
       n: 1,
-      seed: Math.floor(Math.random() * 10000)
+      seed: Math.floor(Math.random() * 1000000)
     }
   };
+  
+  console.log(`    📤 请求参数：${JSON.stringify(payload.parameters)}`);
   
   try {
     const response = await fetch(WANXIANG_CONFIG.endpoint, {
@@ -104,14 +110,16 @@ async function generateImage(prompt, size = '1200x800') {
       body: JSON.stringify(payload)
     });
     
+    const result = await response.json();
+    
     if (!response.ok) {
-      throw new Error(`API 请求失败：${response.status}`);
+      console.error(`    ❌ API 错误：${response.status}`, JSON.stringify(result));
+      throw new Error(`API 请求失败：${response.status} - ${result.message || 'Unknown error'}`);
     }
     
-    const result = await response.json();
     return result;
   } catch (error) {
-    console.error(`生成图片失败：${error.message}`);
+    console.error(`    ❌ 生成图片失败：${error.message}`);
     return null;
   }
 }
